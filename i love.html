@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Твой хомячок</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Arial', sans-serif;
+        }
+
+        body {
+            background-color: #FFB6C1;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            color: #FF1493;
+            position: relative;
+            user-select: none;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 400px;
+            padding: 20px;
+            text-align: center;
+            position: relative;
+        }
+
+        .button {
+            background-color: #4CAF50;
+            border: none;
+            color: white;
+            padding: 15px 30px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 20px;
+            margin: 20px auto;
+            cursor: pointer;
+            border-radius: 5px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            transition: background-color 0.3s;
+        }
+
+        .button:hover {
+            background-color: #45a049;
+        }
+
+        .message {
+            font-size: 30px;
+            font-weight: bold;
+            opacity: 0;
+            visibility: hidden;
+            margin: 20px auto;
+            max-width: 350px;
+            position: relative;
+            z-index: 10;
+            transition: opacity 0.5s, visibility 0.5s;
+        }
+
+        .final-message {
+            font-size: 24px;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.5s, transform 0.5s;
+            margin-top: 50px;
+            z-index: 10;
+            max-width: 300px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .final-message.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Сердца */
+        .heart {
+            position: absolute;
+            color: #FF1493;
+            font-size: 1.8rem;
+            opacity: 0;
+            animation: float-down 6s linear infinite;
+            z-index: 3;
+            transform-origin: center;
+            pointer-events: none;
+        }
+
+        /* Фейерверки */
+        .firework {
+            position: fixed;
+            width: 8px;
+            height: 8px;
+            background-color: #FFD700;
+            border-radius: 50%;
+            pointer-events: none;
+            opacity: 0;
+            animation: firework-fly 1.2s cubic-bezier(0.1, 0.7, 0.1, 1) forwards;
+            z-index: 5;
+        }
+
+        .firework-tail {
+            position: fixed;
+            width: 2px;
+            height: 15px;
+            background: linear-gradient(to bottom, #FF8C00, #FF4500);
+            border-radius: 1px;
+            pointer-events: none;
+            opacity: 0;
+            animation: firework-tail-fly 1s linear forwards;
+            z-index: 5;
+        }
+
+        @keyframes float-down {
+            0% {
+                transform: translateY(-50px) rotate(0deg);
+                opacity: 0;
+            }
+
+            5% {
+                opacity: 1;
+            }
+
+            95% {
+                opacity: 1;
+            }
+
+            100% {
+                transform: translateY(120vh) rotate(720deg);
+                opacity: 0;
+            }
+        }
+
+        @keyframes firework-fly {
+            0% {
+                opacity: 0;
+                transform: translateY(0) scale(0.5);
+            }
+
+            70% {
+                opacity: 1;
+                transform: translateY(-100px) scale(1.2);
+            }
+
+            100% {
+                opacity: 0;
+                transform: translateY(-300px) scale(3);
+            }
+        }
+
+        @keyframes firework-tail-fly {
+            0% {
+                opacity: 0;
+                height: 0;
+                transform: translateY(0);
+            }
+
+            50% {
+                opacity: 0.7;
+                height: 15px;
+                transform: translateY(-50px);
+            }
+
+            100% {
+                opacity: 0;
+                height: 0;
+                transform: translateY(-150px);
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <audio id="bgMusic" loop>
+        <source src="./RXLZQ_-_In_Love_(SkySound.cc).mp3" type="audio/mpeg">
+        <!-- Замените на реальный аудиофайл -->
+        Ваш браузер не поддерживает аудио. Музыка доступна по клику.
+    </audio>
+
+    <div class="container">
+        <button class="button" id="startButton">Нажми на меня!</button>
+        <div class="message" id="loveMessage"></div>
+        <div class="final-message" id="finalMessage">Твой хомячок❤️</div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Бесконечно падающие сердца
+            setInterval(createHeart, 500);
+            bgMusic.addEventListener('click', () => bgMusic.play());
+        });
+
+        // Кнопка и сообщения
+        const startButton = document.getElementById('startButton');
+        const loveMessage = document.getElementById('loveMessage');
+        const finalMessage = document.getElementById('finalMessage');
+        const bgMusic = document.getElementById('bgMusic');
+
+        startButton.addEventListener('click', () => {
+            startButton.style.display = 'none';
+            bgMusic.volume = 0.1;
+            bgMusic.play();
+
+            // Анимация слов
+            typeMessage(["Настя ", "я ", "тебя ", "люблю!"]);
+
+            // Фейерверк 1
+            setTimeout(createFireworkSequence, 500);
+
+            // Показать финал
+            setTimeout(() => {
+                finalMessage.classList.add('visible');
+            }, 3500);
+        });
+
+        function typeMessage(words) {
+            let index = 0;
+            loveMessage.style.visibility = 'visible';
+            loveMessage.textContent = '';
+
+            function showNextWord() {
+                if (index < words.length) {
+                    loveMessage.textContent += words[index];
+                    loveMessage.style.opacity = 1;
+                    index++;
+                    if (index < words.length) setTimeout(showNextWord, 800);
+                } else {
+                    setTimeout(() => {
+                        loveMessage.style.opacity = 0;
+                    }, 1000);
+                }
+            }
+            showNextWord();
+        }
+
+        // Сердца
+        function createHeart() {
+            const heart = document.createElement('div');
+            heart.className = 'heart';
+            heart.textContent = '♥';
+            heart.style.left = `${Math.random() * 100}%`;
+            heart.style.top = `${Math.random() * -50}%`;
+            heart.style.fontSize = `${1.5 + Math.random() * 1}rem`;
+            heart.style.animationDuration = `${5 + Math.random() * 3}s`;
+            document.body.appendChild(heart);
+            setTimeout(() => heart.remove(), 6000);
+        }
+
+        // Фейерверки
+        function createFirework() {
+            const firework = document.createElement('div');
+            firework.className = 'firework';
+            firework.style.left = `${Math.random() * 100}%`;
+            firework.style.top = '85%';
+            firework.style.animationDelay = `${Math.random() * 0.5}s`;
+            document.body.appendChild(firework);
+
+            const tail = document.createElement('div');
+            tail.className = 'firework-tail';
+            tail.style.left = `${Math.random() * 100}%`;
+            tail.style.top = '85%';
+            tail.style.animationDelay = `${Math.random() * 0.5}s`;
+            document.body.appendChild(tail);
+
+            setTimeout(() => {
+                firework.remove();
+                tail.remove();
+            }, 1500);
+        }
+
+        function createFireworkSequence() {
+            for (let i = 0; i < 30; i++) {
+                setTimeout(createFirework, i * 100);
+            }
+        }
+    </script>
+</body>
+
+</html>
